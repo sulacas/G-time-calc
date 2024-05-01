@@ -1,0 +1,37 @@
+// ==UserScript==
+// @name         Grepolis Time Calculator
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  Calculate the time to send troops in Grepolis
+// @author       You saca
+// @match        http*://*.grepolis.ro/*
+// @include      http://*.grepolis.com/game/*
+// @include      https://*.grepolis.com/game/*
+// @grant        none
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    function calculeazaOraTrimite(timpParcurs, oraSosire) {
+        var timpParcursSecunde = timpParcurs.split(':').reduce((acc,time) => (60 * acc) + +time);
+        var oraSosireSecunde = oraSosire.split(':').reduce((acc,time) => (60 * acc) + +time);
+
+        var oraTrimiteSecunde = oraSosireSecunde - timpParcursSecunde;
+        var ore = Math.floor(oraTrimiteSecunde / 3600);
+        var minute = Math.floor((oraTrimiteSecunde - (ore * 3600)) / 60);
+        var secunde = oraTrimiteSecunde - (ore * 3600) - (minute * 60);
+
+        return [ore, minute, secunde].map(v => v < 10 ? "0" + v : v).join(":");
+    }
+
+    window.addEventListener('keydown', function(e) {
+        if (e.key === '=') {
+            var timpParcurs = window.prompt("Introdu timpul de parcurs până la destinație (format hh:mm:ss): ");
+            var oraSosire = window.prompt("Introdu ora la care dorești să ajungă trupele (format hh:mm:ss): ");
+
+            var oraTrimite = calculeazaOraTrimite(timpParcurs, oraSosire);
+            window.alert('Trebuie să trimiți trupele la ora ' + oraTrimite + '.');
+        }
+    });
+})();
